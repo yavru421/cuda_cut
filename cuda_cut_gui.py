@@ -85,9 +85,9 @@ def get_user_session():
         return None
 
 def select_input():
-    path = filedialog.askopenfilename(title="Select Image", filetypes=[("Image files", "*.jpg *.jpeg *.png *.bmp *.tif *.tiff")])
-    if path:
-        input_var.set(path)
+    paths = filedialog.askopenfilenames(title="Select Image(s)", filetypes=[("Image files", "*.jpg *.jpeg *.png *.bmp *.tif *.tiff")])
+    if paths:
+        input_var.set(";".join(paths))
 
 def select_input_folder():
     path = filedialog.askdirectory(title="Select Folder")
@@ -109,17 +109,27 @@ def run_removal():
     if not input_path or not output_dir:
         messagebox.showerror("Error", "Please select both input and output paths.")
         return
+    files = []
     if os.path.isdir(input_path):
         files = [os.path.join(input_path, f) for f in os.listdir(input_path) if f.lower().endswith((".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"))]
+        log_text.delete(1.0, tk.END)
+        log_text.insert(tk.END, f"Found {len(files)} image(s) in folder.\n")
+        if not files:
+            messagebox.showerror("Error", "No image files found in the selected folder.")
+            return
+    elif ";" in input_path:
+        files = input_path.split(";")
+        log_text.delete(1.0, tk.END)
+        log_text.insert(tk.END, f"Selected {len(files)} image(s).\n")
     else:
         files = [input_path]
-    os.makedirs(output_dir, exist_ok=True)
-    log_text.delete(1.0, tk.END)
+        log_text.delete(1.0, tk.END)
     log_text.insert(tk.END, "Starting background removal...\n")
     progress_var.set(0)
     session = get_user_session()
     def worker():
         process_images(files, output_dir, lambda msg: log_text.insert(tk.END, msg + "\n"), session=session, progress_callback=update_progress)
+        log_text.insert(tk.END, f"Processed {len(files)} image(s).\n")
         log_text.insert(tk.END, "Done.\n")
         progress_var.set(100)
     threading.Thread(target=worker, daemon=True).start()
