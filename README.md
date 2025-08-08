@@ -1,7 +1,8 @@
 
 <img width="630" height="354" alt="0001" src="https://github.com/user-attachments/assets/ee51aeac-68a7-4aa6-a60e-962c2dcc18f9" />
 
-# CUDA_Cut
+# CUDA_Cutter
+
 Created by: John Daniel Dondlinger
 
 CUDA_Cut is a simple, GPU-accelerated GUI application for removing backgrounds from images and videos using AI models (CUDA, cuDNN, ONNX Runtime, etc.).
